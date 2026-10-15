@@ -1,0 +1,228 @@
+[0] Normal | RESEARCH PROPOSAL
+[1] Normal | Forecasting Weekly Dengue Cases in Mindanao Cities Using Machine Learning and Lagged Meteorological Features
+[2] Normal | Kris Ian B. Bandiola & Axel A. Balani
+[3] Normal | BS Computer Science  |  South Philippine Adventist College
+[4] Normal | Matanao, Davao del Sur, Philippines  |  Intelligent Systems
+[5] Heading 1 | 1. INTRODUCTION
+[6] Heading 2 | 1.1 Why Dengue Forecasting Matters
+[7] Normal | Dengue has been endemic in the Philippines, and its burden is highly dynamic. In the weekly Department of Health (DOH) surveillance data used in this study, city totals swing sharply from one year to the next: Zamboanga City rose more than fivefold from 1,895 cases in 2018 to 10,247 in 2019, and Cagayan de Oro City nearly tripled from 1,550 in 2017 to 4,537 in 2018. Swings of this size are hard for local health offices to absorb when they are recognized only after the cases have been recorded.
+[8] Normal | Local health offices therefore need forecasts of the cases to be expected, not reports of cases that have already occurred, so that vector-control measures such as fogging and the cleaning of breeding sites can be mobilized before a surge. Weekly case counts suit this purpose because they preserve short-term changes that monthly aggregation hides, and a forecast issued two weeks ahead of the week it describes gives health offices lead time to act.
+[9] Heading 2 | 1.2 Previous Solutions
+[10] Normal | Philippine research already shows that machine learning can model dengue from epidemiological and environmental data. Carvajal et al. (2018) compared Generalized Additive Modeling, SARIMAX, Random Forest, and Gradient Boosting on Metropolitan Manila data from 2009–2013 and found that delayed meteorological effects were more useful than contemporaneous measurements, with Random Forest the strongest model tested. Ligue and Ligue (2022) forecast monthly dengue cases in Davao City from 2008 to June 2021 and found that LSTM achieved the lowest RMSE among the LSTM, MLP, and ARIMA-family models compared.
+[11] Normal | Later studies broadened the field. Buebos-Esteve and Dagamac (2024) modeled provincial incidence and mortality using remotely sensed NDVI and rainfall; Addawe et al. (2024) classified outbreak periods in Baguio City; Francisco et al. (2024) adapted machine learning to the zero-inflated structure of case counts; and Olana et al. (2025) compared several forecasting families on nationwide monthly data. Weekly forecasting has also been studied, by Eligado et al. (2026) in Quezon City with wavelet-based hybrid models, and in Zamboanga Sibugay with ensemble machine-learning models built on DOH-reported cases and NASA POWER climate variables (Delena et al., 2026).
+[12] Normal | These solutions establish that machine-learning dengue forecasting is feasible in the Philippines. They differ, however, in temporal resolution, spatial coverage, and the question they answer, and the studies reviewed here do not establish how much lagged meteorological information adds when recent dengue case history is already available to the model, for weekly forecasts at city level in Mindanao. Section 2 reviews these studies in detail.
+[13] Heading 2 | 1.3 Potential Solutions
+[14] Normal | A practical candidate is the tabular machine-learning model: a regressor trained on engineered lag features rather than on raw sequences. Gradient-boosted trees (XGBoost) can capture nonlinear relationships and interactions among predictors in structured data, generally need less data than recurrent neural networks, and keep the lag structure transparent. For a short weekly panel this model is a sensible fit, although this study does not claim that it is universally better than deep learning.
+[15] Normal | Three potential solutions are therefore considered: a persistence benchmark that repeats the latest observed count; machine-learning models that use recent dengue case history only; and machine-learning models that add lagged meteorological features. Comparing the second and third under identical conditions shows whether meteorological information is worth collecting and maintaining for operational forecasting.
+[16] Heading 2 | 1.4 The Present Study
+[17] Normal | This study will forecast weekly dengue case counts two weeks ahead for Davao City, Cagayan de Oro City, and Zamboanga City. It uses a city-by-week panel built from weekly DOH surveillance data for 2016–2021 (786 city-weeks in the source panel) and linked Project CCHAIN meteorological records. The temporal design is a 70/30 chronological split: training uses weeks from February 2016 through December 2019, and testing uses the remaining weeks of 2020–2021. XGBoost, focusing on a single ML model, will be trained and compared against a persistence baseline and against a case-history-only version of the same XGBoost model (the weather-ablation experiment).
+[18] Normal | Two terms are used consistently throughout. Case-history features are lagged and rolling dengue counts together with cyclical seasonal terms. Meteorological features are the weather-derived and environmental predictors engineered from the Project CCHAIN records: weather lags, rolling weather aggregates, and derived bioclimatic indicators, including a vegetation index. Evaluation uses a leakage-free temporal design with a training period, a two-week embargo between train and test, a held-out test period (2020–2021), and bootstrap confidence intervals.
+[19] Normal | The problem addressed is one of incremental value: whether meteorological features improve short-horizon forecasts of weekly dengue cases beyond what recent case history already provides, and whether any improvement survives on data the models have never seen (2020–2021). Any improvement is interpreted as predictive contribution only; the study does not assert causality.
+[20] Heading 2 | 1.5 Organization of the Proposal
+[21] Normal | Section 2 reviews the related literature, and Section 3 states the research gap and the contribution of the study. Section 4 sets out the research questions, objectives, and hypotheses and shows how each is matched to the method that answers it. Section 5 describes the data, features, models, validation design, and analysis in enough detail for the study to be replicated. Section 6 states the scope, assumptions, and limitations, Section 7 describes the expected outputs, and Section 8 lists the references.
+[22] Heading 1 | 2. REVIEW OF RELATED LITERATURE AND SYNTHESIS
+[23] Normal | Carvajal et al. (2018) is a foundational Philippine reference for meteorological lag effects. Their study used weekly dengue observations in Metropolitan Manila and tested both current and delayed weather variables. Random Forest with delayed meteorological effects performed best, and relative humidity had the greatest variable importance. The study supports engineering lagged environmental variables, but it does not answer whether those variables still give meaningful gains when case history is included explicitly and when forecasts are evaluated on a held-out year.
+[24] Normal | Ligue and Ligue (2022) moved to Davao City and demonstrated the value of nonlinear sequence learning for monthly dengue prediction. The study compared LSTM, MLP, and ARIMA models and found LSTM to have the lowest RMSE. Its joint use of previous monthly cases with temperature, rainfall, and humidity is directly relevant here because it confirms that epidemiological history and climate can be modeled together. The present study differs by using weekly rather than monthly data, explicit lag construction, and tree-based tabular models rather than a recurrent network, and by extending the setting from Davao City to three Mindanao cities.
+[25] Normal | Buebos-Esteve and Dagamac (2024) addressed a larger spatial scale using provincial data and remote-sensing variables, with Random Forest-based learners and temporal clustering. Their work shows that dengue is spatiotemporal rather than purely temporal. The present study works at a finer scale than provinces, using a single city-by-week panel with a uniform weekly target so that forecast errors are comparable across the three cities.
+[26] Normal | Addawe et al. (2024) addressed outbreak-period classification in Baguio City using average cases, relative humidity, temperature, and lagged dengue values. The important distinction is the target: that study predicts outbreak versus non-outbreak periods, while the present study predicts future case counts. Count forecasting retains more information than a binary label because the output can be used to estimate the expected scale of demand on health services.
+[27] Normal | Francisco et al. (2024) adapted machine learning to the zero-inflated structure of dengue case counts and reported improved prediction accuracy. Their work is a reminder that case counts are skewed and often low, which is why the present study reports error in the original count scale (MAE and RMSE) and adds an error ratio against the persistence baseline instead of relying on R² alone.
+[28] Normal | Olana et al. (2025) provides the strongest recent national comparison. It used monthly Philippine provincial data from 2017–2024 and compared SARIMA, NNAR, Random Forest, LSTM, TBATS, and Prophet; NNAR performed best on the reported test data. Because that study is national and comparative, a new proposal cannot claim novelty from national coverage alone. The present study instead shifts the resolution from monthly to weekly, works at city level, and adds an explicit comparison between a case-history-only model and a model with meteorological features.
+[29] Normal | Eligado et al. (2026) show that weekly dengue forecasting and adaptive thresholds are already being studied in Quezon City. Their DWT-SARMA-LSTM approach is primarily univariate, using weekly case counts from 2012–2022, and its main contribution is signal decomposition plus dynamic threshold construction. A proposal centered on weekly forecasting and better thresholds would therefore overlap substantially. The present study does not make threshold construction its central contribution; it tests whether meteorological features add information beyond case history and whether that value holds on a held-out year.
+[30] Normal | The 2026 Zamboanga Sibugay study (Delena et al., 2026) is also close in topic: it evaluates weekly dengue incidence using DOH-reported cases and climate variables with ensemble machine learning. None of these elements (weekly data, XGBoost, Random Forest, or climate inputs) is therefore claimed as novel individually. The defensible contribution lies in the experimental structure described in Section 3.
+[31] Normal | Table 1. Comparison of reviewed studies with the present study
+[32] Normal | 
+[33] Normal | Synthesis. The literature supports the use of lagged weather and case history, but the reviewed studies do not establish whether weather adds predictive value over recent case history for weekly, city-level forecasting in Mindanao cities when models are evaluated on a held-out year. That is the empirical niche of this study. It is stated as a bounded research gap, not as a claim that no Philippine study has ever used similar variables or algorithms.
+[34] Heading 1 | 3. RESEARCH GAP AND NOVEL CONTRIBUTION
+[35] Heading 2 | 3.1 Research Gap
+[36] Normal | The gap is partly geographic and mainly methodological. Philippine studies have already demonstrated the feasibility of machine-learning dengue forecasting, weekly forecasting, climate-based predictors, and model comparison. What remains insufficiently tested is the marginal value of meteorological information when strong autoregressive case features are already available, for weekly city-level forecasting in Mindanao, under a leakage-free temporal design. The gap has three linked dimensions:
+[37] List Paragraph | Incremental-information gap: existing studies establish associations between weather and dengue, but a controlled comparison of a case-history-only model against a case-plus-weather model is not consistently presented for weekly city-level forecasts.
+[38] List Paragraph | Locality and resolution gap: Davao City has been modeled at monthly resolution, and the 2026 weekly study covers Zamboanga Sibugay rather than Cagayan de Oro City or Zamboanga City. A weekly, two-week-ahead evaluation across three Mindanao cities addresses that specific space.
+[39] List Paragraph | Uncertainty gap: point estimates of MAE, RMSE, and R² can overstate differences between models. Bootstrap confidence intervals show whether the gain from meteorological features is distinguishable from sampling noise.
+[40] Heading 2 | 3.2 Novel Contribution
+[41] Normal | The study does not claim that XGBoost is a new dengue model, that weather variables are new predictors, or that weekly dengue forecasting is new in the Philippines. The novelty is the combination of a weekly city-level panel for three Mindanao cities with a controlled, leakage-free experimental design that measures what meteorological information contributes to two-week-ahead forecasts. Specifically, the study contributes:
+[42] List Paragraph | A leakage-free temporal design: models are trained on data from February 2016 to December 2019 (70% of the panel), separated from the 2020–2021 test period by a two-week embargo, and tuned only with forward-chaining cross-validation on the training data.
+[43] List Paragraph | A weather-ablation test: a case-history-only XGBoost model is compared with the full XGBoost model that adds the meteorological features, so the difference in error quantifies whether meteorological information contributes beyond recent dengue trends.
+[44] List Paragraph | A city-level evaluation: errors are summarized for Davao City, Cagayan de Oro City, and Zamboanga City separately, so that a pooled average does not hide poor performance in any one of them.
+[45] List Paragraph | Uncertainty-aware reporting: MAE, RMSE, R², and the error ratio against persistence are reported with bootstrap confidence intervals, including paired intervals for the differences between models, on the held-out test set (2020–2021).
+[46] List Paragraph | Reproducible data handling: source data, preprocessing rules, temporal splits, feature definitions, trained models, metrics, and forecast outputs are kept in a versioned project structure so the experiment can be rerun without manual spreadsheet editing.
+[47] Heading 2 | 3.3 What Is Not Claimed as Novel
+[48] Normal | The following are deliberately excluded from the novelty claim: XGBoost itself; rainfall, temperature, and humidity as dengue predictors; lagged climate variables in general; weekly dengue forecasting in the Philippines in general; and the general idea of using machine learning for Philippine dengue. Stating these items explicitly protects the study from overclaiming.
+[49] Heading 1 | 4. RESEARCH QUESTIONS, OBJECTIVES, AND HYPOTHESES
+[50] Heading 2 | 4.1 Research Questions
+[51] Normal | General research question. To what extent do machine learning models that combine recent dengue case history with lagged meteorological features improve short-horizon forecasts of weekly dengue cases in Mindanao cities, compared with models that use case history alone, when they are evaluated on data they have never seen?
+[52] Normal | The general question is answered through three specific research questions:
+[53] Normal | RQ1.	How accurately do machine learning models forecast weekly dengue cases in Mindanao cities at a short horizon, and do they outperform a persistence baseline?
+[54] Normal | RQ2.	Do lagged meteorological features improve forecast accuracy beyond what recent dengue case history alone provides, by more than sampling variation would explain?
+[55] Normal | RQ3.	How consistent are forecast accuracy and the contribution of meteorological features across individual cities?
+[56] Heading 2 | 4.2 Objectives
+[57] Normal | General objective. To develop and evaluate machine learning models that forecast weekly dengue cases in selected Mindanao cities two weeks ahead, and to determine whether meteorological features add predictive value beyond recent case history. The specific objectives are:
+[58] Normal | SO1.	To compare the forecast accuracy of XGBoost, trained on the full feature set, against a persistence baseline (answers RQ1).
+[59] Normal | SO2.	To measure the predictive contribution of meteorological features by comparing a case-history-only XGBoost model with the full XGBoost model (answers RQ2).
+[60] Normal | SO3.	To describe the consistency of accuracy and of the meteorological contribution across Davao City, Cagayan de Oro City, and Zamboanga City (answers RQ3).
+[61] Heading 2 | 4.3 Hypotheses
+[62] Normal | Each hypothesis below is stated in its alternative form and is evaluated against a corresponding null hypothesis of no difference. Decision rules are given in Section 5.9.
+[63] Normal | H1.	On the held-out test set (2020–2021), the full XGBoost model achieves a lower MAE than the persistence baseline (RQ1).
+[64] Normal | H2.	On the held-out test set (2020–2021), the full XGBoost model achieves a lower MAE than the case-history-only XGBoost model, and the 95% bootstrap confidence interval of the paired MAE difference excludes zero (RQ2).
+[65] Normal | H3.	The size of the MAE advantage of the full XGBoost model over the case-history-only model differs among the three cities (RQ3).
+[66] Heading 2 | 4.4 Alignment of Questions, Objectives, Hypotheses, and Methods
+[67] Normal | Table 2 shows how each research question is carried through to the objective, hypothesis, comparison, and analysis that answer it, and ties all of them to the study title: machine learning model (XGBoost) and meteorological features (the full versus the case-history-only feature set), forecasting weekly dengue cases in Mindanao cities.
+[68] Normal | Table 2. Alignment of research questions, objectives, hypotheses, and methods
+[69] Normal | 
+[70] Heading 1 | 5. METHODOLOGY
+[71] Heading 2 | 5.1 Research Design
+[72] Normal | The study is a quantitative, retrospective forecasting experiment on secondary, de-identified data. It is framed as a supervised regression problem: for each city and forecast origin, a model predicts the number of dengue cases reported two weeks later. The design is a controlled comparison. Every model is trained, tuned, and scored on the same rows and the same chronological splits, so that differences in error can be attributed to the model or to the feature set and not to the data handling. No human participants are involved.
+[73] Heading 2 | 5.2 Data Sources and Access
+[74] Normal | The primary data are weekly dengue surveillance counts reported by the DOH for 2016–2021, linked to daily meteorological records from Project CCHAIN, an open linked health–climate dataset (Project CCHAIN, 2024). The weekly dengue–meteorology release of Pelitro et al. (2026) is the companion source for the weekly linkage. Both are openly available at the locations given in the reference list, so another researcher can obtain the same data. The project repository will record the exact files used, their retrieval dates, and file checksums.
+[75] Normal | The records are aggregated into a city-by-week panel for Davao City, Cagayan de Oro City, and Zamboanga City, giving 786 city-weeks in the source panel. The dengue field is the weekly count reported through DOH surveillance for each city. Meteorological fields are weekly aggregates of daily records, and the field definitions and aggregation rules are documented in a project data dictionary so that every derived value can be traced to its source. The source panel extends through 2021, with training on weeks from February 2016 through December 2019 (~70%) and testing on the remaining weeks of 2020–2021 (~30%). No case or weather values are invented to fill long gaps.
+[76] Heading 2 | 5.3 Variables
+[77] Normal | Table 3. Variables used in the study
+[78] Normal | 
+[79] Heading 2 | 5.4 Data Preparation
+[80] List Paragraph | Rows are sorted by city, year, and week number, and an internal weekly order is created for each city.
+[81] List Paragraph | Weeks after December 2019 are excluded from training and tuning, but are used for testing. Weeks within the study period are not smoothed or filled with synthetic values.
+[82] List Paragraph | Plausibility checks are run on case counts and weather values. Flagged records are reviewed and retained unless source inspection shows an actual data error; a flag by itself is not treated as proof of a wrong observation.
+[83] List Paragraph | The first four observations of each city are dropped because they lack the history needed for the lagged features. The number of usable rows in each partition is reported with the results.
+[84] List Paragraph | Any fitting-dependent preprocessing is fitted on training data only.
+[85] Heading 2 | 5.5 Forecast Formulation
+[86] Normal | For city c and forecast origin t, the target is the reported dengue case count at t+2, two weeks after the origin. The model learns a function f such that f(X[c,t]) = y[c,t+2], where the predictor matrix X contains only information available by week t. No future dengue cases and no future weather values are used, which prevents the model from benefiting from information that would not exist at prediction time. The study addresses this single horizon. Error is measured on the original case-count scale. A later prototype may convert predicted counts into an alert indicator, but binary outbreak classification is outside the scope of this study.
+[87] Normal | Models are fitted on the pooled panel of the three cities. The city identifier is not a predictor, so the models rely on case-history features to carry each city’s scale.
+[88] Heading 2 | 5.6 Feature Set
+[89] Normal | Features are engineered from the weekly case counts and the meteorological records, and every feature uses only information available at the forecast origin. The 28 features fall into five groups (Table 4). The six case-history features (case momentum and cyclical seasonality) form the case-history-only feature set; the remaining 22 are the meteorological features, which the full model adds.
+[90] Normal | Table 4. Engineered feature set
+[91] Normal | 
+[92] Normal | The feature count follows from the available fields and the research question, not from a wish for more features. Many features are correlated, so a larger count is not treated as better in itself. The case-history-only model and the full model are compared on identical splits, so any gain from the meteorological features is measured rather than assumed. Quality-check fields are not predictors.
+[93] Heading 2 | 5.7 Models
+[94] Normal | Three approaches are compared (Table 5). The persistence baseline predicts the value two weeks ahead as the most recent observed value and sets the minimum practical benchmark. XGBoost (Chen & Guestrin, 2016), a gradient-boosted decision-tree algorithm, is the primary and sole machine-learning model because it performs well on structured tabular data. The study focuses on a single ML model (XGBoost) to test whether a practical tabular model can give accurate short-horizon forecasts for individual Mindanao cities.
+[95] Normal | Table 5. Models compared
+[96] Normal | 
+[97] Normal | Hyperparameters are tuned only on the training data with forward-chaining cross-validation. Every tuned model follows the same tuning protocol, and the search space is fixed in a configuration file before any test data are scored. Random seeds are fixed and reported so that training can be repeated.
+[98] Heading 2 | 5.8 Temporal Validation
+[99] Normal | Random row splitting is not used. Because rows are ordered in time and the predictors contain lagged case counts, a random split could let observations from future periods influence model selection. The pipeline instead trains on a fixed historical period, separates it from the test period (2020–2021) by a two-week embargo, and tunes hyperparameters with forward-chaining cross-validation on the training data only.
+[100] Normal | Table 6. Temporal partitions
+[101] Normal | 
+[102] Normal | Features are constructed so that the target at t+2 never contributes to predictors at t. The 2020–2021 test set remains untouched until final evaluation. The first two weeks of 2020 are retained only to complete the two-week-ahead targets of the final December 2019 training origins; they are not scored as forecast origins.
+[103] Heading 2 | 5.9 Evaluation Metrics and Statistical Analysis
+[104] Normal | Forecasts are scored with Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), and the coefficient of determination (R²). MAE gives the average size of the error in cases, RMSE gives extra weight to large misses at epidemic peaks, and R² summarizes the share of variation in weekly counts that the forecasts explain. Because R² is unstable when counts are low or skewed, MAE and RMSE are the primary measures. Because the three cities differ greatly in case volume, a pooled MAE is dominated by the largest city; each model’s MAE is therefore also expressed as a ratio to the persistence MAE (relative MAE), and all metrics are reported per city as well as pooled. Ordinary classification accuracy is not used, because the outcome is a count.
+[105] Normal | Uncertainty is quantified with a block bootstrap (Künsch, 1989). Contiguous weekly blocks are resampled within each city so that serial dependence in the weekly series is preserved, and the block length is fixed in the configuration file before evaluation. Each metric is reported with a 95% percentile bootstrap interval. For comparisons between two models, the same resampled blocks are applied to both models and the interval is computed for the paired difference in MAE.
+[106] Normal | Decision rules. H1 and H2 are supported when the point estimate of the paired MAE difference favors the more complex model and its 95% interval excludes zero. H3 is evaluated by comparing the per-city paired MAE differences and their intervals. A hypothesis that is not supported is reported as a finding, not tuned away.
+[107] Heading 2 | 5.10 Weather-Ablation Experiment
+[108] Normal | The key comparison is a controlled predictive ablation, not a causal inference. The case-history-only XGBoost model establishes how much forecast signal exists in recent dengue history. The full XGBoost model then adds the meteorological features, with the same rows, splits, tuning protocol, and random seeds. The paired MAE difference, with its interval, is interpreted as predictive contribution and not as proof that weather causes dengue.
+[109] Heading 2 | 5.11 Software and Implementation Pipeline
+[110] Normal | The pipeline is implemented in Python with pandas for data handling, scikit-learn for cross-validation utilities, and the xgboost library for gradient boosting. Library versions are pinned in a requirements file and reported so the environment can be rebuilt.
+[111] Normal | Table 7. Implementation pipeline
+[112] Normal | 
+[113] Heading 2 | 5.12 Reproducibility and Ethical Considerations
+[114] Normal | The analysis uses de-identified, aggregated public data and collects no personal identifiers. The study cites the data sources and preserves their original data-quality metadata. The project repository will contain the raw downloaded source data, the data-validation script, the feature-engineering module, the training scripts, configuration files, evaluation outputs, and a README that explains how to reproduce the experiment. Source data are never silently altered; any cleaned analytical copy is generated programmatically from the original files.
+[115] Heading 1 | 6. SCOPE, ASSUMPTIONS, AND LIMITATIONS
+[116] Heading 2 | 6.1 Scope
+[117] List Paragraph | Geographic: Davao City, Cagayan de Oro City, and Zamboanga City. Results are not claimed to generalize to other Mindanao cities, other regions of the Philippines, or other countries.
+[118] List Paragraph | Temporal: training uses weekly data from February 2016 through December 2019 (the source panel extends to 2021, giving 786 city-weeks, with the 2020–2021 weeks held out for testing). The embargo and the 2020–2021 test set are fixed in advance.
+[119] List Paragraph | Outcome: weekly dengue case counts, not individual patient outcomes, serotype classification, hospitalization, mortality, or vector abundance.
+[120] List Paragraph | Environmental: rainfall, temperature, and relative humidity from Project CCHAIN, together with derived bioclimatic indicators (heat index, temperature extremes, SPI-3, and percent-of-normal precipitation) and NDVI. Population movement, vector-control activity, and socioeconomic conditions are not modeled.
+[121] Heading 2 | 6.2 Assumptions
+[122] List Paragraph | DOH weekly counts are a consistent measure of dengue activity within each city over the study period, even though reporting completeness may vary.
+[123] List Paragraph | The Project CCHAIN meteorological records are representative of conditions in each city.
+[124] List Paragraph | A single model fitted on the pooled panel, without a city identifier, is appropriate for all three cities; the per-city results test this assumption.
+[125] List Paragraph | Relationships learned in the training years are informative for the near future. Stationarity is not assumed; the held-out test set (2020–2021) examines it directly.
+[126] Heading 2 | 6.3 Limitations and Range of Validity
+[127] List Paragraph | The two-year held-out test period (2020–2021) is a limited evaluation. This period was marked by disrupted disease and reporting patterns, so performance during this time may not reflect typical epidemiological dynamics.
+[128] List Paragraph | Tree-based models predict within the range of target values seen in training. If the test set contains peaks larger than any training week, forecasts at those peaks will tend to be too low. Error is therefore reported by city, and RMSE is reported alongside MAE to expose large misses.
+[129] List Paragraph | Improved prediction from weather does not establish that a specific weather variable causes dengue. The study evaluates predictive usefulness only.
+[130] List Paragraph | The models are trained on historical observations and do not ingest live DOH feeds. Real-time deployment would require a stable operational data pipeline and governance process.
+[131] List Paragraph | The findings are valid for these three cities, this forecast horizon, and these data sources.
+[132] Heading 1 | 7. EXPECTED OUTPUTS AND CONTRIBUTION
+[133] Normal | The study is designed so that either outcome is informative. If the full model consistently beats the case-history-only model (H2), the result supports the usefulness of meteorological data for earlier warning. If the improvement is small or disappears on the held-out year (H2), that is also a meaningful finding because it indicates that recent dengue history may already contain most of the short-term predictive signal. Differences among cities (H3) will show where a pooled model is adequate and where city-specific modeling may be needed.
+[134] Normal | The main computer-science output is a reproducible forecasting pipeline and an evaluation of two-week-ahead dengue forecasts for three Mindanao cities, reported with bootstrap confidence intervals. The study is a forecasting experiment; any interface or alert system built on it is future work.
+[135] Heading 1 | 8. REFERENCES
+[136] Normal | Addawe, J. C., Juayong, R. A. B., & Caro, J. D. L. (2024). Prediction of outbreak periods of dengue in Baguio City, Philippines using machine learning classification models. Atlantis Highlights in Computer Sciences, 380–394. https://doi.org/10.2991/978-94-6463-388-7_23
+[137] Normal | Breiman, L. (2001). Random forests. Machine Learning, 45(1), 5–32. https://doi.org/10.1023/A:1010933404324
+[138] Normal | Buebos-Esteve, D. E., & Dagamac, N. H. A. (2024). Spatiotemporal models of dengue epidemiology in the Philippines: Integrating remote sensing and interpretable machine learning. Acta Tropica, 255, 107225. https://doi.org/10.1016/j.actatropica.2024.107225
+[139] Normal | Carvajal, T. M., Viacrusis, K. M., Hernandez, L. F. T., Ho, H. T., Amalin, D. M., & Watanabe, K. (2018). Machine learning methods reveal the temporal pattern of dengue incidence using meteorological factors in metropolitan Manila, Philippines. BMC Infectious Diseases, 18, 183. https://doi.org/10.1186/s12879-018-3066-0
+[140] Normal | Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (pp. 785–794). ACM. https://doi.org/10.1145/2939672.2939785
+[141] Normal | Delena, R., Diam, T., Dequiña, B. J. M., & Sacayan, R. R. (2026). Machine learning models for predicting weekly dengue incidence based on climate data: A case study in Zamboanga Sibugay. In Proceedings of the 5th International Conference on Novel and Intelligent Digital Systems (NiDS 2025) (pp. 419–429). https://doi.org/10.1007/978-3-032-10824-1_33
+[142] Normal | Eligado, A. A., Hasegawa, T., Hattori, Y., & Nakamura, K. (2026). Advancing outbreak detection: Hybridizing machine learning with wavelets for weekly dengue case forecasting. PLOS Neglected Tropical Diseases, 20(7), e0014444. https://doi.org/10.1371/journal.pntd.0014444
+[143] Normal | Francisco, M. E., Carvajal, T. M., & Watanabe, K. (2024). Hybrid machine learning approach to zero-inflated data improves accuracy of dengue prediction. PLOS Neglected Tropical Diseases, 18(10), e0012599. https://doi.org/10.1371/journal.pntd.0012599
+[144] Normal | Künsch, H. R. (1989). The jackknife and the bootstrap for general stationary observations. The Annals of Statistics, 17(3), 1217–1241. https://doi.org/10.1214/aos/1176347265
+[145] Normal | Ligue, K. D. B., & Ligue, K. J. B. (2022). Deep learning approach to forecasting dengue cases in Davao City using long short-term memory (LSTM). Philippine Journal of Science, 151(3), 797–812. https://doi.org/10.56899/151.03.01
+[146] Normal | Olana, K. O. A., Poprom, N., Siewchaisakul, P., Punyapornwithaya, V., & Thongprachum, A. (2025). Spatial distribution analysis and comparative forecasting of dengue resurgence in the Philippines (2025–2027): A nationwide study. Transboundary and Emerging Diseases. https://doi.org/10.1155/tbed/7480710
+[147] Normal | Pelitro, K. J., Matavia, T. O., Soriano, K., Garcia, G. M., Manzano, J. F., Bilbao, K., Delos Angeles, A. J., Cruz, R., Lagmay, A. M., & Bandoy, D. J. D. (2026). Weekly dengue incidence linked to meteorological variables at city, regional, and multi-setting scales [Data set]. Zenodo. https://zenodo.org/records/21978184
+[148] Normal | Project CCHAIN. (2024). Open, validated, health, climate, environment and socioeconomic linked dataset optimized for machine learning: Baseline model for predicting disease outbreak periods. https://thinkingmachines.github.io/project-cchain/open_model.html
+[149] Heading 2 | 8.1 Citation Map
+[150] Normal | Table 8. Where each claim or design decision is supported
+[151] Normal | 
+
+--- TABLE 0 ---
+Study | Philippine scope | Target / resolution | Main methods | What the present study does differently
+Carvajal et al. (2018) | Metropolitan Manila | Dengue incidence; weekly | GAM, SARIMAX, RF, Gradient Boosting | Forecasts city-level weekly counts for three Mindanao cities; tests case-only versus case-plus-weather XGBoost models
+Ligue & Ligue (2022) | Davao City | Dengue cases; monthly | LSTM, MLP, ARIMA | Uses weekly rather than monthly resolution and transparent lag features instead of recurrent sequence learning; extends Davao City to Cagayan de Oro City and Zamboanga City
+Buebos-Esteve & Dagamac (2024) | Philippine provinces | Incidence and mortality; dekadal | RF-based interpretable ML | Works at city level with a weekly count target and an explicit two-week-ahead evaluation
+Addawe et al. (2024) | Five Baguio City barangays | Outbreak class; monthly / period labels | RF, DT, Gradient Boosting | Predicts numeric future case counts rather than a binary outbreak class
+Olana et al. (2025) | Philippine provinces, nationwide | Cases; monthly | SARIMA, NNAR, RF, LSTM, TBATS, Prophet | Moves to weekly, city-level resolution and isolates the incremental value of weather information
+Eligado et al. (2026) | Quezon City | Cases; weekly | DWT-SARMA, DWT-SARMA-LSTM | Adds exogenous weather lags and evaluates on a held-out year in Mindanao cities
+Delena et al. (2026) | Zamboanga Sibugay | Incidence; weekly | RF, XGBoost, and other ensembles | Covers three Mindanao cities with a case-only ablation, an embargoed temporal split, and bootstrap confidence intervals
+
+--- TABLE 1 ---
+RQ | Objective | Hypothesis | Models and data compared | Analysis and evidence reported
+RQ1 | SO1 | H1 | Persistence baseline and full XGBoost on the held-out test set (2020–2021) | MAE, RMSE, R², and error ratio against persistence, pooled and per city, with block-bootstrap 95% confidence intervals
+RQ2 | SO2 | H2 | Case-history-only XGBoost versus full XGBoost on identical rows, splits, and tuning protocol | Paired block-bootstrap interval for the MAE difference (Section 5.10)
+RQ3 | SO3 | H3 | All models, evaluated separately for each city | Per-city metrics and per-city paired MAE differences with intervals
+
+--- TABLE 2 ---
+Variable | Source / field | Role | Treatment
+City | City identifier | Panel grouping | Retained as panel metadata; not used as a predictor
+Year | Surveillance year | Temporal ordering | Used for split logic; not used as a continuous predictor
+Week number | Surveillance week | Seasonal position | Converted to sine and cosine terms
+Weekly dengue cases | DOH weekly surveillance | Target and historical predictor | Target is the count at t+2; past values enter only through lag and rolling features
+Rainfall | Project CCHAIN (daily, aggregated to weekly) | Meteorological predictor | Lagged and four-week aggregated
+Temperature | Project CCHAIN (daily, aggregated to weekly) | Meteorological predictor | Lagged and four-week aggregated
+Relative humidity | Project CCHAIN (daily, aggregated to weekly) | Meteorological predictor | Lagged and four-week aggregated
+Temperature extremes and heat index | Project CCHAIN climate_atmosphere (tmin, tmax, heat_index) | Bioclimatic predictor | Weekly aggregates ending at the forecast origin; diurnal range = tmax − tmin
+SPI-3 and percent of normal precipitation | Project CCHAIN climate_indices (spi3, pnp); monthly | Bioclimatic predictor | Value from the most recent month completed on or before the forecast origin, carried across the following weeks
+NDVI | Project CCHAIN climate_land (satellite vegetation index) | Vegetation predictor | Latest observation available on or before the forecast origin
+Data-quality checks | Completeness and plausibility checks | Quality control | Not used as predictive variables
+
+--- TABLE 3 ---
+Feature group | Features | Count | Reason for inclusion
+Weather lags | rainfall_lag1 to rainfall_lag4; temperature_lag1 to temperature_lag4; humidity_lag1 to humidity_lag4 | 12 | Tests delayed environmental association at short weekly leads
+Rolling aggregates | rainfall_rollsum4, temperature_rollmean4, humidity_rollmean4 | 3 | Represents sustained environmental exposure over the recent month rather than one week alone
+Case momentum | cases_lag1, cases_lag2, cases_lag4, cases_rollmean4 | 4 | Captures immediate, short-term, and roughly monthly disease momentum and the recent four-week burden
+Bioclimatic indicators | heat_index, tmin, tmax, diurnal_temp_range, spi3, pnp, ndvi | 7 | Capture heat stress, day–night temperature swing, antecedent wetness relative to long-term norms, and vegetation condition, which rainfall, temperature, and humidity alone do not express
+Cyclical seasonality | sin_week, cos_week | 2 | Represents the annual cycle without treating week 52 and week 1 as far apart
+Total predictors | Five groups | 28 | 6 case-history features + 22 meteorological features
+
+--- TABLE 4 ---
+Model | Inputs | Purpose
+Persistence baseline | Most recent dengue count | Establishes a minimum practical benchmark
+Case-only XGBoost | Case momentum features and cyclical seasonality (6 predictors) | Measures how much can be forecast from dengue history alone
+Full XGBoost | Case-only inputs plus the meteorological features (28 predictors) | Tests the added value of meteorological information
+
+--- TABLE 5 ---
+Stage | Period | Role
+Training and tuning | February 2016 – December 2019 (~70%) | Model fitting; hyperparameters tuned by forward-chaining cross-validation on training data only
+Embargo | Two weeks after the end of training | Excluded from training and testing so lag windows do not overlap
+Held-out test set | 2020–2021 (~30%) | One-time out-of-sample performance assessment
+
+--- TABLE 6 ---
+Step | Implementation | Output
+1. Load | Python, pandas | Clean city-by-week dataframe
+2. Validate | Schema checks, missing-week check, plausibility review | Data-quality report
+3. Order | Sort by city, year, and week | Chronological panel
+4. Engineer | Create 28 predictors from past information only | Feature matrix for the t+2 target
+5. Split | Train February 2016 – December 2019 (~70%), two-week embargo, test 2020–2021 | Leakage-controlled partitions
+6. Tune and train | Forward-chaining cross-validation; persistence, case-only XGBoost, full XGBoost | Trained models
+7. Evaluate | MAE, RMSE, R², relative MAE; block bootstrap, including paired differences | Per-city and pooled results
+8. Report | Tables, figures, versioned outputs | Reproducible results package
+
+--- TABLE 7 ---
+Claim or design decision | Primary supporting source
+Weather lags are relevant to Philippine dengue forecasting | Carvajal et al. (2018)
+Monthly Davao City forecasting has already been demonstrated | Ligue & Ligue (2022)
+Philippine spatiotemporal machine learning can use environmental remote sensing | Buebos-Esteve & Dagamac (2024)
+Outbreak classification already exists in Baguio City | Addawe et al. (2024)
+Dengue counts can be zero-inflated, which affects the choice of error measures | Francisco et al. (2024)
+Nationwide monthly forecasting has recently been compared across many methods | Olana et al. (2025)
+Weekly Quezon City forecasting with dynamic thresholds already exists | Eligado et al. (2026)
+Weekly climate-based machine-learning forecasting exists in Zamboanga Sibugay | Delena et al. (2026)
+Weekly DOH dengue counts and daily weather are available as open linked data for Philippine cities | Project CCHAIN (2024); Pelitro et al. (2026)
+XGBoost algorithm | Chen & Guestrin (2016)
+Block bootstrap for dependent time series | Künsch (1989)

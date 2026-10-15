@@ -1,0 +1,25 @@
+# Conda environment contents
+/Lib/
+/Library/
+/DLLs/
+/Scripts/
+/Tools/
+/include/
+/libs/
+/share/
+/conda-meta/
+/etc/
+/python.exe
+/pythonw.exe
+/python*.dll
+/*.dll
+/*.pdb
+/LICENSE_PYTHON.txt
+/.nonadmin
+/.commandcode/
+
+# Generated files and local caches
+__pycache__/
+.ipynb_checkpoints/
+/outputs/
+/data/merged_dengue_panel_real.csv
